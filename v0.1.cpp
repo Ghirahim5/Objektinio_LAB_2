@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -8,11 +9,13 @@ struct {
     string p;
     double egz_rez;
     int nd_sk;
+    int nd_rez[10];
 } Duomenys;
 
 int main() {
 
     double rez;
+    string pasirinkimas;
 
     cout << "Koks jusu vardas?" << endl;
     cin >> Duomenys.v;
@@ -23,20 +26,49 @@ int main() {
     cout << "Kiek namu darbu atlikote?" << endl;
     cin >> Duomenys.nd_sk;
 
+    // Namu darbu rezultatu ivedimas ir sumos skaiciavimas
+
     double nd_sum = 0;
-    for (int i = 1; i <= Duomenys.nd_sk; i++) {
-        cout << "Koks buvo " << i << "-o namu darbo vertinimas?" << endl;
-        double nd_rez;
-        cin >> nd_rez;
-        nd_sum += nd_rez;
+    for (int i = 0; i < Duomenys.nd_sk; i++) {
+        cout << "Koks buvo " << i + 1 << "-o namu darbo vertinimas?" << endl;
+        cin >> Duomenys.nd_rez[i];
+        nd_sum += Duomenys.nd_rez[i];
     }
 
-    double nd_avg = nd_sum / Duomenys.nd_sk;
-    rez = 0.4 * nd_avg + 0.6 * Duomenys.egz_rez;
+    // Namu darbu masyvo rusiavimas
 
-    cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
-    cout << "-----------------------------------------------" << endl;
-    cout << left << setw(15) << Duomenys.v << setw(15) << Duomenys.p << fixed << setprecision(2) << setw(15) << rez << endl;
+    sort(Duomenys.nd_rez, Duomenys.nd_rez + Duomenys.nd_sk);
 
+    // Medianos skaiciavimas
+
+    double mediana;
+    if (Duomenys.nd_sk % 2 == 0) {
+        mediana = (Duomenys.nd_rez[Duomenys.nd_sk / 2 - 1] + Duomenys.nd_rez[Duomenys.nd_sk / 2]) / 2.0;
+    }
+    else {
+        mediana = Duomenys.nd_rez[Duomenys.nd_sk / 2];
+    }
+
+    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (Vid. / Med.)" << endl;
+    cin >> pasirinkimas;
+    cout << endl;
+
+    if (pasirinkimas == "Vid.") {
+        double nd_avg = nd_sum / Duomenys.nd_sk;
+        rez = 0.4 * nd_avg + 0.6 * Duomenys.egz_rez;
+
+        cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
+        cout << "-----------------------------------------------" << endl;
+        cout << left << setw(15) << Duomenys.v << setw(15) << Duomenys.p << fixed << setprecision(2) << setw(15) << rez << endl;
+
+    }
+    else if (pasirinkimas == "Med.") {
+
+        rez = 0.4 * mediana + 0.6 * Duomenys.egz_rez;
+
+        cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Med.)" << endl;
+        cout << "-----------------------------------------------" << endl;
+        cout << left << setw(15) << Duomenys.v << setw(15) << Duomenys.p << fixed << setprecision(2) << setw(15) << rez << endl;
+    }
     return 0;
 }
