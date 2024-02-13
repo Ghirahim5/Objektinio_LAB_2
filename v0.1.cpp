@@ -87,10 +87,11 @@ int main() {
     // Namu darbu rezultatu ivedimas ir sumos skaiciavimas
 
     double nd_sum = 0;
+
     for (int i = 0; i < Duomenys.nd_sk; i++) {
         cout << "Koks buvo " << i + 1 << "-o namu darbo vertinimas?" << endl;
-        while (!(cin >> Duomenys.nd_rez[i]) || Duomenys.nd_rez[i] < 0 || Duomenys.nd_rez[i] > 10) {
-            cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
+        while (!(cin >> Duomenys.nd_rez[i]) || Duomenys.nd_rez[i] <= 0 || Duomenys.nd_rez[i] > 10 || cin.peek() != '\n') {
+            cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Koks buvo " << i + 1 << "-o namu darbo vertinimas?" << endl;
