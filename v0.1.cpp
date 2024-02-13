@@ -9,7 +9,7 @@ struct {
     string p;
     double egz_rez;
     int nd_sk;
-    int nd_rez[10];
+    double nd_rez[10];
 } Duomenys;
 
 int main() {
@@ -22,7 +22,11 @@ int main() {
     cout << "Kokia jusu pavarde?" << endl;
     cin >> Duomenys.p;
     cout << "Koks buvo jusu egzamino rezultatas?" << endl;
-    cin >> Duomenys.egz_rez;
+    while (!(cin >> Duomenys.egz_rez) || Duomenys.egz_rez < 0 || Duomenys.egz_rez > 10) {
+        cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
+        cin.clear(); 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
     cout << "Kiek namu darbu atlikote?" << endl;
     cin >> Duomenys.nd_sk;
 
