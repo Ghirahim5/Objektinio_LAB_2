@@ -31,8 +31,11 @@ void Skaitymas(vector<Studentas>& Duomenys);
 
 int main() {
 
+    vector<Studentas> Duomenys;
+
     srand(time(NULL));
 
+    string pasirinkimas, pasirinkimas1, pasirinkimas2;
     int veiksmas;
 
     while (true) {
@@ -86,8 +89,33 @@ int main() {
 
         case 5:
         {
-            vector<Studentas> Duomenys;
             Skaitymas(Duomenys);
+            cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju "
+                "pasirinkimu: (Vid. / Med.)"
+                << endl;
+            cin >> pasirinkimas;
+            while (pasirinkimas != "Vid." && pasirinkimas != "Med.") {
+                cout << "Pasirinkite arba 'Vid.' arba 'Med.'" << endl;
+                cin >> pasirinkimas;
+            }
+            cout << endl;
+            cout << "Kokia tvarka norite rusiuoti rezultatus: (D - Didejancia, M - Mazejancia)" << endl;
+            cin >> pasirinkimas1;
+            cout << endl;
+            while (pasirinkimas1 != "D" && pasirinkimas1 != "M") {
+                cout << "Pasirinkite arba 'D' arba 'M'" << endl;
+                cin >> pasirinkimas1;
+            }
+            cout << endl;
+
+            cout << "Kaip norite matyti rezultatus? (E - Ekrane, F - Faile) " << endl;
+            cin >> pasirinkimas2;
+            cout << endl;
+            while (pasirinkimas2 != "E" && pasirinkimas2 != "F") {
+                cout << "Pasirinkite arba 'E' arba 'F'" << endl;
+                cin >> pasirinkimas2;
+            }
+            cout << endl;
         }
         break;
 
