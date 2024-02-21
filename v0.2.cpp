@@ -35,7 +35,7 @@ int main() {
 
     srand(time(NULL));
     int veiksmas;
-    string pasirinkimas, pasirinkimas1, pasirinkimas2;
+    string pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3;
 
     while (true) {
         cout << "1 - Vesti duomenis rankiniu budu" << endl;
@@ -94,6 +94,17 @@ int main() {
             while (pasirinkimas != "V" && pasirinkimas != "M") {
                 cout << "Pasirinkite arba 'V' arba 'M'" << endl;
                 cin >> pasirinkimas;
+            }
+            cout << endl;
+
+            cout << "Pagal ka norite rusiuoti rezultatus?" << endl;
+            cout << "V - Varda" << endl;
+            cout << "P - Pavarde" << endl;
+            cout << "B - Bala" << endl;
+            cin >> pasirinkimas3;
+            while (pasirinkimas3 != "V" && pasirinkimas3 != "P" && pasirinkimas3 != "B") {
+                cout << "Pasirinkite arba 'V' arba 'P' arba 'B'" << endl;
+                cin >> pasirinkimas3;
             }
             cout << endl;
 
