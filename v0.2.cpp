@@ -28,7 +28,7 @@ void RankinisIvedimas(int m);
 void GeneruotiPazymius(int m2);
 void GeneruotiPazymiusVardus(int m3);
 void Skaitymas(vector<Studentas>& Duomenys);
-void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas1, string pasirinkimas, string pasirinkimas2);
+void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string pasirinkimas1, string pasirinkimas2, string pasirinkimas3);
 
 int main() {
     vector<Studentas> Duomenys;  // Vektorius skirtas saugoti studentu duomenims
@@ -124,7 +124,7 @@ int main() {
             }
             cout << endl;
 
-            RusiuotiSpausdinti(Duomenys, pasirinkimas1, pasirinkimas, pasirinkimas2);
+            RusiuotiSpausdinti(Duomenys, pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3);
 
         } break;
 
@@ -530,9 +530,8 @@ void Skaitymas(vector<Studentas>& Duomenys) {
     infile.close();
 }
 
-void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas1, string pasirinkimas, string pasirinkimas2) {
+void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string pasirinkimas1, string pasirinkimas2, string pasirinkimas3) {
     // Skaiciuojami galutiniai rezultatai
-
     for (auto& studentas : Duomenys) {
         if (pasirinkimas == "V") {
             studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
@@ -544,31 +543,38 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas1, strin
     }
 
     // Rusiuojama pagal pasirinkta kriteriju
-    if (pasirinkimas1 == "D") {
-        sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez < b.rez; });
+    if (pasirinkimas3 == "V") {
+        if (pasirinkimas1 == "D")
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.v > b.v; });
+        else
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.v < b.v; });
     }
-    else {
-        sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez > b.rez; });
+    else if (pasirinkimas3 == "P") {
+        if (pasirinkimas1 == "D")
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.p > b.p; });
+        else
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.p < b.p; });
+    }
+    else if (pasirinkimas3 == "B") {
+        if (pasirinkimas1 == "D")
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez > b.rez; });
+        else
+            sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez < b.rez; });
     }
 
     // Pasirenkamas spausdinimas i konsole arba faila
     if (pasirinkimas2 == "E") {
         if (pasirinkimas == "V") {
-            // Spausdinama pagal vidurki
-            cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
+            cout << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Vid.)" << endl;
             cout << "-----------------------------------------------" << endl;
-            for (auto& studentas : Duomenys) {
-                studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
-                studentas.rez = 0.4 * studentas.nd_vid + 0.6 * studentas.egz_rez;
+            for (const auto& studentas : Duomenys) {
                 cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
         }
         else {
-            // Spausdinama pagal mediana
-            cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Med.)" << endl;
+            cout << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Med.)" << endl;
             cout << "-----------------------------------------------" << endl;
-            for (auto& studentas : Duomenys) {
-                studentas.rez = 0.4 * studentas.mediana + 0.6 * studentas.egz_rez;
+            for (const auto& studentas : Duomenys) {
                 cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
         }
@@ -581,26 +587,20 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas1, strin
             return;
         }
         if (pasirinkimas == "V") {
-            // Irasoma pagal vidurki
-            outfile << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
+            outfile << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Vid.)" << endl;
             outfile << "-----------------------------------------------" << endl;
-            for (auto& studentas : Duomenys) {
-                studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
-                studentas.rez = 0.4 * studentas.nd_vid + 0.6 * studentas.egz_rez;
+            for (const auto& studentas : Duomenys) {
                 outfile << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
         }
         else {
-            // Irasoma pagal mediana
-            outfile << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Med.)" << endl;
+            outfile << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Med.)" << endl;
             outfile << "-----------------------------------------------" << endl;
-            for (auto& studentas : Duomenys) {
-                studentas.rez = 0.4 * studentas.mediana + 0.6 * studentas.egz_rez;
+            for (const auto& studentas : Duomenys) {
                 outfile << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
         }
         outfile.close();
         cout << "Rezultatai irasyti i faila rezultatai.txt" << endl;
-        cout << endl;
     }
 }
