@@ -24,9 +24,9 @@ struct Studentas {
     double mediana;
 };
 
-void RankinisIvedimas(int m);
-void GeneruotiPazymius(int m2);
-void GeneruotiPazymiusVardus(int m3);
+void RankinisIvedimas(vector<Studentas>& Duomenys);
+void GeneruotiPazymius(vector<Studentas>& Duomenys);
+void GeneruotiPazymiusVardus(int m);
 void Skaitymas(vector<Studentas>& Duomenys);
 void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string pasirinkimas1, string pasirinkimas2, string pasirinkimas3);
 
@@ -41,8 +41,8 @@ int main() {
         cout << "1 - Vesti duomenis rankiniu budu" << endl;
         cout << "2 - Generuoti pazymius" << endl;
         cout << "3 - Generuoti ir pazymius ir studentu vardus" << endl;
-        cout << "4 - Baigti darba" << endl;
-        cout << "5 - Nuskaityti duomenis is failo" << endl;
+        cout << "4 - Nuskaityti duomenis is failo" << endl;
+        cout << "5 - Baigti darba" << endl;
         cout << endl;
         cout << "Pasirinkite veiksma ivesdami skaiciu: ";
         cin >> veiksmas;
@@ -50,25 +50,12 @@ int main() {
 
         switch (veiksmas) {
         case 1:
-            cout << "Iveskite studentu skaiciu" << endl;
-            int m;
-            while (!(cin >> m) || cin.peek() != '\n' || m <= 0) {
-                cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-            RankinisIvedimas(m);
+
+            RankinisIvedimas(Duomenys);
             break;
 
         case 2:
-            cout << "Iveskite studentu skaiciu" << endl;
-            int m2;
-            while (!(cin >> m2) || cin.peek() != '\n' || m2 <= 0) {
-                cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-            GeneruotiPazymius(m2);
+            GeneruotiPazymius(Duomenys);
             break;
 
         case 3:
@@ -82,11 +69,7 @@ int main() {
             GeneruotiPazymiusVardus(m3);
             break;
 
-        case 4:
-            cout << "Programa baigia darba." << endl;
-            return 0;
-
-        case 5: {
+        case 4: {
             Skaitymas(Duomenys);
 
             cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
@@ -128,6 +111,10 @@ int main() {
 
         } break;
 
+        case 5:
+            cout << "Programa baigia darba." << endl;
+            return 0;
+
         default:
             cout << "Neteisinga ivestis, prasome ivesti viena is pateiktu pasirinkimo variantu" << endl;
             cin.clear();
@@ -137,103 +124,74 @@ int main() {
     }
 }
 
-void RankinisIvedimas(int m) {
-    vector<Studentas> Duomenys(m);
+void RankinisIvedimas(vector<Studentas>& Duomenys) {
+    Studentas studentas;
+    double pazymys;
 
-    for (int i = 0; i < m; i++) {
-        cout << "Koks jusu vardas?" << endl;
-        bool valid_v = true;
-        do {
-            if (!(cin >> Duomenys[i].v)) {
-                valid_v = false;
-            }
-            else {
-                valid_v = true;
-                for (char c : Duomenys[i].v) {
-                    if (!isalpha(c)) {
-                        valid_v = false;
-                        break;
-                    }
-                }
-            }
-            if (!valid_v) {
-                cout << "Neteisinga ivestis, prasome ivesti savo varda sudaryta tik is raidziu " << endl;
+    cout << "Jei norite baigti iveskite zodi BAIGTI kaip studento varda arba pavarde" << endl;
+    cout << endl;
+
+    while (true) {
+        cout << "Iveskite studento varda: ";
+        cin >> studentas.v;
+        if (studentas.v == "BAIGTI" || studentas.v == "Baigti" || studentas.v == "baigti") break;
+        while (cin.fail() || any_of(studentas.v.begin(), studentas.v.end(), [](char c) { return !isalpha(c); })) {
+            cout << "Neteisinga ivestis, prasome ivesti varda sudaryta is raidziu" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Iveskite studento varda: ";
+            cin >> studentas.v;
+        }
+        cout << "Iveskite studento pavarde: ";
+        cin >> studentas.p;
+        if (studentas.p == "BAIGTI" || studentas.p == "Baigti" || studentas.p == "baigti") break;
+        while (cin.fail() || any_of(studentas.p.begin(), studentas.p.end(), [](char c) { return !isalpha(c); })) {
+            cout << "Neteisinga ivestis, prasome ivesti pavarde sudaryta is raidziu" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Iveskite studento pavarde: ";
+            cin >> studentas.p;
+        }
+
+        while (true) {
+            cout << "Iveskite studento namu darbu pazymi (jei norite baigti iveskite -1): " << endl;
+            while (!(cin >> pazymys) || pazymys < -1 || pazymys > 10) {
+                cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
-        } while (!valid_v);
-
-        // Pavardes ivestis
-
-        cout << "Kokia jusu pavarde?" << endl;
-        bool valid_p = true;
-        do {
-            if (!(cin >> Duomenys[i].p)) {
-                valid_p = false;
-            }
-            else {
-                valid_p = true;
-                for (char c : Duomenys[i].p) {
-                    if (!isalpha(c)) {
-                        valid_p = false;
-                        break;
-                    }
-                }
-            }
-            if (!valid_p) {
-                cout << "Neteisinga ivestis, prasome ivesti savo pavarde sudaryta tik is raidziu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-        } while (!valid_p);
+            if (pazymys == -1) break;
+            studentas.nd_rez.push_back(pazymys);
+        }
 
         // Egzamino rezultato ivestis
 
-        cout << "Koks buvo jusu egzamino rezultatas?" << endl;
-        while (!(cin >> Duomenys[i].egz_rez) || Duomenys[i].egz_rez < 0 || Duomenys[i].egz_rez > 10) {
+        cout << "Koks buvo studento egzamino rezultatas?" << endl;
+        while (!(cin >> studentas.egz_rez) || studentas.egz_rez < 0 || studentas.egz_rez > 10) {
             cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
-        // Namu darbu skaiciaus ivestis
+        // Namu darbu sumos skaiciavimas
 
-        cout << "Kiek namu darbu atlikote?" << endl;
-        while (!(cin >> Duomenys[i].n) || Duomenys[i].n < 0) {
-            cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        }
-
-        Duomenys[i].nd_rez.resize(Duomenys[i].n);
-
-        // Namu darbu rezultatu ivedimas ir sumos skaiciavimas
-
-        for (int j = 0; j < Duomenys[i].n; j++) {
-            cout << "Koks buvo " << j + 1 << "-o namu darbo vertinimas?" << endl;
-            while (!(cin >> Duomenys[i].nd_rez[j]) || Duomenys[i].nd_rez[j] <= 0 || Duomenys[i].nd_rez[j] > 10 || cin.peek() != '\n') {
-                cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Koks buvo " << i + 1 << "-o namu darbo vertinimas?" << endl;
-            }
-            Duomenys[i].nd_sum += Duomenys[i].nd_rez[j];
-        }
+        studentas.nd_sum = accumulate(studentas.nd_rez.begin(), studentas.nd_rez.end(), 0.0);
 
         // Namu darbu masyvo rusiavimas
 
-        sort(Duomenys[i].nd_rez.begin(), Duomenys[i].nd_rez.end());
+        sort(studentas.nd_rez.begin(), studentas.nd_rez.end());
 
         // Medianos skaiciavimas
 
-        if (Duomenys[i].n % 2 == 0) {
-            Duomenys[i].mediana = (Duomenys[i].nd_rez[Duomenys[i].n / 2 - 1] + Duomenys[i].nd_rez[Duomenys[i].n / 2]) / 2.0;
+        if (studentas.nd_rez.size() % 2 == 0) {
+            studentas.mediana = (studentas.nd_rez[studentas.nd_rez.size() / 2 - 1] + studentas.nd_rez[studentas.nd_rez.size() / 2]) / 2.0;
         }
         else {
-            Duomenys[i].mediana = Duomenys[i].nd_rez[Duomenys[i].n / 2];
+            studentas.mediana = studentas.nd_rez[studentas.nd_rez.size() / 2];
         }
-    }
 
+        Duomenys.push_back(studentas);
+    }
     // Rezultatu spausdinimas pasirenkant Vid. arba Med.
 
     string pasirinkimas;
@@ -249,110 +207,88 @@ void RankinisIvedimas(int m) {
     if (pasirinkimas == "V") {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
         cout << "-----------------------------------------------" << endl;
+        for (auto& studentas : Duomenys) {
+            studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
+            studentas.rez = 0.4 * studentas.nd_vid + 0.6 * studentas.egz_rez;
+            cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
+        }
     }
     else {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Med.)" << endl;
         cout << "-----------------------------------------------" << endl;
-    }
-
-    for (int i = 0; i < m; i++) {
-        if (pasirinkimas == "V") {
-            Duomenys[i].nd_vid = Duomenys[i].nd_sum / Duomenys[i].n;
-            Duomenys[i].rez = 0.4 * Duomenys[i].nd_vid + 0.6 * Duomenys[i].egz_rez;
-            cout << left << setw(15) << Duomenys[i].v << setw(15) << Duomenys[i].p << fixed << setprecision(2) << setw(15) << Duomenys[i].rez << endl;
-        }
-        else {
-            Duomenys[i].rez = 0.4 * Duomenys[i].mediana + 0.6 * Duomenys[i].egz_rez;
-            cout << left << setw(15) << Duomenys[i].v << setw(15) << Duomenys[i].p << fixed << setprecision(2) << setw(15) << Duomenys[i].rez << endl;
+        for (auto& studentas : Duomenys) {
+            studentas.rez = 0.4 * studentas.mediana + 0.6 * studentas.egz_rez;
+            cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
         }
     }
     cout << endl;
 }
 
-void GeneruotiPazymius(int m2) {
-    vector<Studentas> Duomenys(m2);
+void GeneruotiPazymius(vector<Studentas>& Duomenys) {
+    Studentas studentas;
 
-    for (int i = 0; i < m2; i++) {
-        cout << "Koks jusu vardas?" << endl;
-        bool valid_v = true;
-        do {
-            if (!(cin >> Duomenys[i].v)) {
-                valid_v = false;
-            }
-            else {
-                valid_v = true;
-                for (char c : Duomenys[i].v) {
-                    if (!isalpha(c)) {
-                        valid_v = false;
-                        break;
-                    }
-                }
-            }
-            if (!valid_v) {
-                cout << "Neteisinga ivestis, prasome ivesti savo varda sudaryta tik is raidziu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-        } while (!valid_v);
+    cout << "Jei norite baigti iveskite zodi BAIGTI kaip studento varda arba pavarde" << endl;
+    cout << endl;
 
-        // Pavardes ivestis
-
-        cout << "Kokia jusu pavarde?" << endl;
-        bool valid_p = true;
-        do {
-            if (!(cin >> Duomenys[i].p)) {
-                valid_p = false;
-            }
-            else {
-                valid_p = true;
-                for (char c : Duomenys[i].p) {
-                    if (!isalpha(c)) {
-                        valid_p = false;
-                        break;
-                    }
-                }
-            }
-            if (!valid_p) {
-                cout << "Neteisinga ivestis, prasome ivesti savo pavarde sudaryta tik is raidziu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-        } while (!valid_p);
+    while (true) {
+        cout << "Iveskite studento varda: ";
+        cin >> studentas.v;
+        if (studentas.v == "BAIGTI" || studentas.v == "Baigti" || studentas.v == "baigti") break;
+        while (cin.fail() || any_of(studentas.v.begin(), studentas.v.end(), [](char c) { return !isalpha(c); })) {
+            cout << "Neteisinga ivestis, prasome ivesti varda sudaryta is raidziu" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Iveskite studento varda: ";
+            cin >> studentas.v;
+        }
+        cout << "Iveskite studento pavarde: ";
+        cin >> studentas.p;
+        if (studentas.p == "BAIGTI" || studentas.p == "Baigti" || studentas.p == "baigti") break;
+        while (cin.fail() || any_of(studentas.p.begin(), studentas.p.end(), [](char c) { return !isalpha(c); })) {
+            cout << "Neteisinga ivestis, prasome ivesti pavarde sudaryta is raidziu" << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Iveskite studento pavarde: ";
+            cin >> studentas.p;
+        }
 
         // Egzamino rezultato generavimas
 
-        Duomenys[i].egz_rez = (rand() % 10) + 1;
+        studentas.egz_rez = (rand() % 10) + 1;
 
         // Namu darbu skaiciaus generavimas
 
-        Duomenys[i].n = (rand() % 10) + 1;
+        int n = (rand() % 10) + 1;
 
-        Duomenys[i].nd_rez.resize(Duomenys[i].n);
+        studentas.nd_rez.resize(n);
 
         // Namu darbu rezultatu generavimas ir sumos skaiciavimas
 
-        for (int j = 0; j < Duomenys[i].n; j++) {
-            Duomenys[i].nd_rez[j] = (rand() % 10) + 1;
-            Duomenys[i].nd_sum += Duomenys[i].nd_rez[j];
+        for (int j = 0; j < n; j++) {
+            studentas.nd_rez[j] = (rand() % 10) + 1;
+            studentas.nd_sum += studentas.nd_rez[j];
         }
 
         // Namu darbu masyvo rusiavimas
 
-        sort(Duomenys[i].nd_rez.begin(), Duomenys[i].nd_rez.end());
+        sort(studentas.nd_rez.begin(), studentas.nd_rez.end());
 
         // Medianos skaiciavimas
 
-        if (Duomenys[i].n % 2 == 0) {
-            Duomenys[i].mediana = (Duomenys[i].nd_rez[Duomenys[i].n / 2 - 1] + Duomenys[i].nd_rez[Duomenys[i].n / 2]) / 2.0;
+        if (studentas.nd_rez.size() % 2 == 0) {
+            studentas.mediana = (studentas.nd_rez[studentas.nd_rez.size() / 2 - 1] + studentas.nd_rez[studentas.nd_rez.size() / 2]) / 2.0;
         }
         else {
-            Duomenys[i].mediana = Duomenys[i].nd_rez[Duomenys[i].n / 2];
+            studentas.mediana = studentas.nd_rez[studentas.nd_rez.size() / 2];
         }
+
+        Duomenys.push_back(studentas);
     }
 
     // Rezultatu spausdinimas pasirenkant Vid. arba Med.
 
     string pasirinkimas;
+    cout << endl;
     cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
     cin >> pasirinkimas;
     cout << endl;
@@ -365,26 +301,23 @@ void GeneruotiPazymius(int m2) {
     if (pasirinkimas == "V") {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
         cout << "-----------------------------------------------" << endl;
+        for (auto& studentas : Duomenys) {
+            studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
+            studentas.rez = 0.4 * studentas.nd_vid + 0.6 * studentas.egz_rez;
+            cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
+        }
+        cout << endl;
     }
     else {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Med.)" << endl;
         cout << "-----------------------------------------------" << endl;
-    }
-
-    for (int i = 0; i < m2; i++) {
-        if (pasirinkimas == "V") {
-            Duomenys[i].nd_vid = Duomenys[i].nd_sum / Duomenys[i].n;
-            Duomenys[i].rez = 0.4 * Duomenys[i].nd_vid + 0.6 * Duomenys[i].egz_rez;
-            cout << left << setw(15) << Duomenys[i].v << setw(15) << Duomenys[i].p << fixed << setprecision(2) << setw(15) << Duomenys[i].rez << endl;
+        for (auto& studentas : Duomenys) {
+            studentas.rez = 0.4 * studentas.mediana + 0.6 * studentas.egz_rez;
+            cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
         }
-        else {
-            Duomenys[i].rez = 0.4 * Duomenys[i].mediana + 0.6 * Duomenys[i].egz_rez;
-            cout << left << setw(15) << Duomenys[i].v << setw(15) << Duomenys[i].p << fixed << setprecision(2) << setw(15) << Duomenys[i].rez << endl;
-        }
+        cout << endl;
     }
-    cout << endl;
 }
-
 void GeneruotiPazymiusVardus(int m3) {
     vector<Studentas> Duomenys(m3);
 
@@ -393,8 +326,10 @@ void GeneruotiPazymiusVardus(int m3) {
 
         vector<string> VyriskiVardai = { "Arvydas", "Robertas", "Deivydas", "Marius", "Matas", "Jokubas", "Nojus", "Augustas", "Tomas", "Arnas" };
         vector<string> MoteriskiVardai = { "Gija", "Patricija", "Ieva", "Karolina", "Sandra", "Vita", "Aleksandra", "Liepa", "Smilte", "Guoste" };
-        vector<string> VyriskosPavardes = { "Petrauskas", "Jankauskas", "Butkus", "Navickas", "Kazlauskas", "Urbanavicius", "Sadauskas", "Mazeika", "Kavaliauskas", "Adomaitis" };
-        vector<string> MoteriskosPavardes = { "Kazlauskaite", "Petrauskaite", "Kavaliauskaite", "Jankauskaite", "Pociute", "Balciunaite", "Lukoseviciute", "Vasiliauskaite", "Butkute", "Leonaviciute" };
+        vector<string> VyriskosPavardes = { "Petrauskas",   "Jankauskas", "Butkus",  "Navickas",     "Kazlauskas",
+                                           "Urbanavicius", "Sadauskas",  "Mazeika", "Kavaliauskas", "Adomaitis" };
+        vector<string> MoteriskosPavardes = { "Kazlauskaite", "Petrauskaite",  "Kavaliauskaite", "Jankauskaite", "Pociute",
+                                             "Balciunaite",  "Lukoseviciute", "Vasiliauskaite", "Butkute",      "Leonaviciute" };
 
         // Vardo ir Pavardes generavimas
 
@@ -407,14 +342,9 @@ void GeneruotiPazymiusVardus(int m3) {
             Duomenys[i].p = MoteriskosPavardes[rand() % MoteriskosPavardes.size()];
         }
 
-        // Namu darbu skaiciaus ivestis
+        // Namu darbu skaiciaus generavimas
 
-        cout << "Kiek namu darbu atliko " << i + 1 << "-asis studentas" << endl;
-        while (!(cin >> Duomenys[i].n) || Duomenys[i].n < 0) {
-            cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        }
+        Duomenys[i].n = (rand() % 10) + 1;
 
         Duomenys[i].nd_rez.resize(Duomenys[i].n);
 
