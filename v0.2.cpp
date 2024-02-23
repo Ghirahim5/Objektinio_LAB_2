@@ -9,8 +9,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 struct Studentas {
     string v;
@@ -27,15 +29,16 @@ struct Studentas {
 void RankinisIvedimas(vector<Studentas>& Duomenys);
 void GeneruotiPazymius(vector<Studentas>& Duomenys);
 void GeneruotiPazymiusVardus(int m);
-void Skaitymas(vector<Studentas>& Duomenys);
-void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string pasirinkimas1, string pasirinkimas2, string pasirinkimas3);
+double Skaitymas(const string& pavadinimas, vector<Studentas>& Duomenys);
+void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string& pavadinimas);
 
 int main() {
+
     vector<Studentas> Duomenys;  // Vektorius skirtas saugoti studentu duomenims
 
     srand(time(NULL));
     int veiksmas;
-    string pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3;
+    string pavadinimas;
 
     while (true) {
         cout << "1 - Vesti duomenis rankiniu budu" << endl;
@@ -70,45 +73,27 @@ int main() {
             break;
 
         case 4: {
-            Skaitymas(Duomenys);
 
-            cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
-            cin >> pasirinkimas;
-            while (pasirinkimas != "V" && pasirinkimas != "M") {
-                cout << "Pasirinkite arba 'V' arba 'M'" << endl;
-                cin >> pasirinkimas;
-            }
+            cout << "Is kurio failo norit nuskaityti duomenis?" << endl;
             cout << endl;
-
-            cout << "Pagal ka norite rusiuoti rezultatus?" << endl;
-            cout << "V - Varda" << endl;
-            cout << "P - Pavarde" << endl;
-            cout << "B - Bala" << endl;
-            cin >> pasirinkimas3;
-            while (pasirinkimas3 != "V" && pasirinkimas3 != "P" && pasirinkimas3 != "B") {
-                cout << "Pasirinkite arba 'V' arba 'P' arba 'B'" << endl;
-                cin >> pasirinkimas3;
-            }
+            cout << "1 - 'kursiokai.txt'" << endl;
+            cout << "2 - 'studentai10000.txt'" << endl;
+            cout << "3 - 'studentai100000.txt'" << endl;
+            cout << "4 - 'studentai1000000.txt'" << endl;
             cout << endl;
+            cin >> pavadinimas;
+            if (pavadinimas == "1")
+                pavadinimas = "kursiokai.txt";
+            if (pavadinimas == "2")
+                pavadinimas = "studentai10000.txt";
+            if (pavadinimas == "3")
+                pavadinimas = "studentai100000.txt";
+            if (pavadinimas == "4")
+                pavadinimas = "studentai1000000.txt";
 
-            cout << "Kokia tvarka norite rusiuoti rezultatus: (D - Didejancia, M - Mazejancia)" << endl;
-            cin >> pasirinkimas1;
-            while (pasirinkimas1 != "D" && pasirinkimas1 != "M") {
-                cout << "Pasirinkite arba 'D' arba 'M'" << endl;
-                cin >> pasirinkimas1;
-            }
-            cout << endl;
-
-            cout << "Kaip norite matyti rezultatus? (E - Ekrane, F - Faile) " << endl;
-            cin >> pasirinkimas2;
-            while (pasirinkimas2 != "E" && pasirinkimas2 != "F") {
-                cout << "Pasirinkite arba 'E' arba 'F'" << endl;
-                cin >> pasirinkimas2;
-            }
-            cout << endl;
-
-            RusiuotiSpausdinti(Duomenys, pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3);
-
+            Skaitymas(pavadinimas, Duomenys);
+            double laikas = Skaitymas(pavadinimas, Duomenys);
+            RusiuotiSpausdinti(Duomenys, laikas, pavadinimas);
         } break;
 
         case 5:
@@ -326,10 +311,8 @@ void GeneruotiPazymiusVardus(int m3) {
 
         vector<string> VyriskiVardai = { "Arvydas", "Robertas", "Deivydas", "Marius", "Matas", "Jokubas", "Nojus", "Augustas", "Tomas", "Arnas" };
         vector<string> MoteriskiVardai = { "Gija", "Patricija", "Ieva", "Karolina", "Sandra", "Vita", "Aleksandra", "Liepa", "Smilte", "Guoste" };
-        vector<string> VyriskosPavardes = { "Petrauskas",   "Jankauskas", "Butkus",  "Navickas",     "Kazlauskas",
-                                           "Urbanavicius", "Sadauskas",  "Mazeika", "Kavaliauskas", "Adomaitis" };
-        vector<string> MoteriskosPavardes = { "Kazlauskaite", "Petrauskaite",  "Kavaliauskaite", "Jankauskaite", "Pociute",
-                                             "Balciunaite",  "Lukoseviciute", "Vasiliauskaite", "Butkute",      "Leonaviciute" };
+        vector<string> VyriskosPavardes = { "Petrauskas", "Jankauskas", "Butkus", "Navicka" "Kazlauskas" "Urbanavicius", "Sadauskas", "Mazeika", "Kavaliauskas", "Adomaitis" };
+        vector<string> MoteriskosPavardes = { "Kazlauskaite", "Petrauskaite", "Kavaliauskaite", "Jankauskaite", "Pociute", "Balciunaite", "Lukoseviciute", "Vasiliauskaite", "Butkute", "Leonaviciute" };
 
         // Vardo ir Pavardes generavimas
 
@@ -404,15 +387,17 @@ void GeneruotiPazymiusVardus(int m3) {
     }
     cout << endl;
 }
-void Skaitymas(vector<Studentas>& Duomenys) {
+double Skaitymas(const string& pavadinimas, vector<Studentas>& Duomenys) {
     Studentas studentas;
     string line;
 
     ifstream infile("kursiokai.txt");
     if (!infile) {
         cerr << "Nepavyko atidaryti failo.";
-        return;
+        return -1; // Return -1 to indicate failure
     }
+
+    auto pradzia = high_resolution_clock::now();
 
     // Nuskaitoma ir ignoruojama pirmoji eilute
 
@@ -434,7 +419,7 @@ void Skaitymas(vector<Studentas>& Duomenys) {
         }
         if (studentas.nd_rez.empty()) {
             cerr << "Nerasta namu darbu ivertinimu.";
-            return;
+            return -1; // Return -1 to indicate failure
         }
 
         studentas.nd_sum = studentas.nd_sum - studentas.nd_rez.back();
@@ -458,9 +443,52 @@ void Skaitymas(vector<Studentas>& Duomenys) {
     }
 
     infile.close();
+
+    auto pabaiga = high_resolution_clock::now();
+    duration<double> trukme = pabaiga - pradzia;
+    double laikas = trukme.count();
+
+    return laikas;
 }
 
-void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string pasirinkimas1, string pasirinkimas2, string pasirinkimas3) {
+void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string& pavadinimas) {
+    string pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3;
+    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
+    cin >> pasirinkimas;
+    while (pasirinkimas != "V" && pasirinkimas != "M") {
+        cout << "Pasirinkite arba 'V' arba 'M'" << endl;
+        cin >> pasirinkimas;
+    }
+    cout << endl;
+
+    cout << "Pagal ka norite rusiuoti rezultatus?" << endl;
+    cout << "V - Varda" << endl;
+    cout << "P - Pavarde" << endl;
+    cout << "B - Bala" << endl;
+    cin >> pasirinkimas3;
+    while (pasirinkimas3 != "V" && pasirinkimas3 != "P" && pasirinkimas3 != "B") {
+        cout << "Pasirinkite arba 'V' arba 'P' arba 'B'" << endl;
+        cin >> pasirinkimas3;
+    }
+    cout << endl;
+
+    cout << "Kokia tvarka norite rusiuoti rezultatus: (D - Didejancia, M - Mazejancia)" << endl;
+    cin >> pasirinkimas1;
+    while (pasirinkimas1 != "D" && pasirinkimas1 != "M") {
+        cout << "Pasirinkite arba 'D' arba 'M'" << endl;
+        cin >> pasirinkimas1;
+    }
+    cout << endl;
+
+    cout << "Kaip norite matyti rezultatus? (E - Ekrane, F - Faile) " << endl;
+    cin >> pasirinkimas2;
+    while (pasirinkimas2 != "E" && pasirinkimas2 != "F") {
+        cout << "Pasirinkite arba 'E' arba 'F'" << endl;
+        cin >> pasirinkimas2;
+    }
+    cout << endl;
+
+
     // Skaiciuojami galutiniai rezultatai
     for (auto& studentas : Duomenys) {
         if (pasirinkimas == "V") {
@@ -500,6 +528,7 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string
             for (const auto& studentas : Duomenys) {
                 cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
+            cout << endl;
         }
         else {
             cout << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Med.)" << endl;
@@ -507,6 +536,7 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string
             for (const auto& studentas : Duomenys) {
                 cout << left << setw(15) << studentas.v << setw(15) << studentas.p << fixed << setprecision(2) << setw(15) << studentas.rez << endl;
             }
+            cout << endl;
         }
     }
     else {
@@ -533,4 +563,6 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, string pasirinkimas, string
         outfile.close();
         cout << "Rezultatai irasyti i faila rezultatai.txt" << endl;
     }
+    cout << pavadinimas <<" uztruko apdoroti: "<< laikas << " sekundes" << endl;
+    cout << endl;
 }
