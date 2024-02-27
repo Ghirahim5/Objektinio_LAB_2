@@ -14,6 +14,9 @@
 using namespace std;
 using namespace std::chrono;
 
+double bendras_laikas = 0;
+int vykdymu_skaicius = 0;
+
 struct Studentas {
     string v;
     string p;
@@ -62,38 +65,71 @@ int main() {
             break;
 
         case 3:
-            cout << "Iveskite studentu skaiciu" << endl;
             int m3;
-            while (!(cin >> m3) || cin.peek() != '\n' || m3 <= 0) {
-                cout << "Neteisinga ivestis, prasome ivesti skaiciu" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            while (true) {
+                try {
+                    cout << "Iveskite studentu skaiciu: "; cin >> m3;
+                    cout << endl;
+                    if (cin.fail() || m3 <= 0) {
+                        throw runtime_error("Neteisinga ivestis, prasome ivesti skaiciu");
+                    }
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    GeneruotiPazymiusVardus(m3);
+                    break;
+                }
+                catch (const exception& e) {
+                    cout << e.what() << endl;
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
             }
-            GeneruotiPazymiusVardus(m3);
             break;
 
         case 4: {
+            try {
+                int pasirinkimas;
+                cout << "Is kurio failo norit nuskaityti duomenis?" << endl;
+                cout << endl;
+                cout << "1 - 'kursiokai.txt'" << endl;
+                cout << "2 - 'studentai10000.txt'" << endl;
+                cout << "3 - 'studentai100000.txt'" << endl;
+                cout << "4 - 'studentai1000000.txt'" << endl;
+                cout << endl;
+                cout << "Iveskite pasirinkima: "; cin >> pasirinkimas;
+                cout << endl;
+                while (cin.fail() || pasirinkimas <= 0 || pasirinkimas > 4) {
+                    cout << "Neteisinga ivestis, prasome ivesti skaiciu nuo 1 iki 4" << endl;
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin >> pasirinkimas;
+                }
+                switch (pasirinkimas) {
+                case 1:
+                    pavadinimas = "kursiokai.txt";
+                    break;
+                case 2:
+                    pavadinimas = "studentai10000.txt";
+                    break;
+                case 3:
+                    pavadinimas = "studentai100000.txt";
+                    break;
+                case 4:
+                    pavadinimas = "studentai1000000.txt";
+                    break;
+                }
 
-            cout << "Is kurio failo norit nuskaityti duomenis?" << endl;
-            cout << endl;
-            cout << "1 - 'kursiokai.txt'" << endl;
-            cout << "2 - 'studentai10000.txt'" << endl;
-            cout << "3 - 'studentai100000.txt'" << endl;
-            cout << "4 - 'studentai1000000.txt'" << endl;
-            cout << endl;
-            cin >> pavadinimas;
-            if (pavadinimas == "1")
-                pavadinimas = "kursiokai.txt";
-            if (pavadinimas == "2")
-                pavadinimas = "studentai10000.txt";
-            if (pavadinimas == "3")
-                pavadinimas = "studentai100000.txt";
-            if (pavadinimas == "4")
-                pavadinimas = "studentai1000000.txt";
+                double laikas = Skaitymas(pavadinimas, Duomenys);
+                RusiuotiSpausdinti(Duomenys, laikas, pavadinimas);
 
-            Skaitymas(pavadinimas, Duomenys);
-            double laikas = Skaitymas(pavadinimas, Duomenys);
-            RusiuotiSpausdinti(Duomenys, laikas, pavadinimas);
+                bendras_laikas += laikas;
+                vykdymu_skaicius++;
+
+                cout << "Vidutinis vykdymo laikas: " << bendras_laikas / vykdymu_skaicius << " sekundes" << endl;
+                cout << endl;
+            }
+            catch (const exception& e) {
+                cout << e.what() << endl;
+            }
         } break;
 
         case 5:
@@ -117,45 +153,77 @@ void RankinisIvedimas(vector<Studentas>& Duomenys) {
     cout << endl;
 
     while (true) {
-        cout << "Iveskite studento varda: ";
-        cin >> studentas.v;
-        if (studentas.v == "BAIGTI" || studentas.v == "Baigti" || studentas.v == "baigti") break;
-        while (cin.fail() || any_of(studentas.v.begin(), studentas.v.end(), [](char c) { return !isalpha(c); })) {
-            cout << "Neteisinga ivestis, prasome ivesti varda sudaryta is raidziu" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        try {
             cout << "Iveskite studento varda: ";
             cin >> studentas.v;
+            cout << endl;
+            if (studentas.v == "BAIGTI" || studentas.v == "Baigti" || studentas.v == "baigti") break;
+            if (cin.fail() || any_of(studentas.v.begin(), studentas.v.end(), [](char c) { return !isalpha(c); })) {
+                throw runtime_error("Neteisinga ivestis, prasome ivesti varda sudaryta is raidziu");
+            }
         }
-        cout << "Iveskite studento pavarde: ";
-        cin >> studentas.p;
-        if (studentas.p == "BAIGTI" || studentas.p == "Baigti" || studentas.p == "baigti") break;
-        while (cin.fail() || any_of(studentas.p.begin(), studentas.p.end(), [](char c) { return !isalpha(c); })) {
-            cout << "Neteisinga ivestis, prasome ivesti pavarde sudaryta is raidziu" << endl;
+        catch (const exception& e) {
+            cout << e.what() << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Iveskite studento pavarde: ";
-            cin >> studentas.p;
+            continue;
         }
 
         while (true) {
-            cout << "Iveskite studento namu darbu pazymi (jei norite baigti iveskite -1): " << endl;
-            while (!(cin >> pazymys) || pazymys < -1 || pazymys > 10) {
-                cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
+            try {
+                cout << "Iveskite studento pavarde: ";
+                cin >> studentas.p;
+                cout << endl;
+                if (studentas.p == "BAIGTI" || studentas.p == "Baigti" || studentas.p == "baigti") break;
+                if (cin.fail() || any_of(studentas.p.begin(), studentas.p.end(), [](char c) { return !isalpha(c); })) {
+                    throw runtime_error("Neteisinga ivestis, prasome ivesti pavarde sudaryta is raidziu");
+                }
+                break;
+            }
+            catch (const exception& e) {
+                cout << e.what() << endl;
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                continue;
             }
-            if (pazymys == -1) break;
-            studentas.nd_rez.push_back(pazymys);
+        }
+
+        while (true) {
+            try {
+                cout << "Iveskite studento namu darbu pazymi (jei norite baigti iveskite -1): " << endl;
+                cin >> pazymys;
+                cout << endl;
+                if (cin.fail() || pazymys < -1 || pazymys > 10) {
+                    throw runtime_error("Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje");
+                }
+                if (pazymys == -1) break;
+                studentas.nd_rez.push_back(pazymys);
+            }
+            catch (const exception& e) {
+                cout << e.what() << endl;
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                continue;
+            }
         }
 
         // Egzamino rezultato ivestis
-
-        cout << "Koks buvo studento egzamino rezultatas?" << endl;
-        while (!(cin >> studentas.egz_rez) || studentas.egz_rez < 0 || studentas.egz_rez > 10) {
-            cout << "Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        while (true) {
+            try {
+                cout << "Koks buvo studento egzamino rezultatas?" << endl;
+                cin >> studentas.egz_rez;
+                cout << endl;
+                if (cin.fail() || studentas.egz_rez < 0 || studentas.egz_rez > 10) {
+                    throw runtime_error("Neteisinga ivestis, prasome ivesti skaiciu 10-baleje sistemoje");
+                }
+                break;
+            }
+            catch (const exception& e) {
+                cout << e.what() << endl;
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                continue;
+            }
         }
 
         // Namu darbu sumos skaiciavimas
@@ -176,20 +244,25 @@ void RankinisIvedimas(vector<Studentas>& Duomenys) {
         }
 
         Duomenys.push_back(studentas);
+
     }
+
     // Rezultatu spausdinimas pasirenkant Vid. arba Med.
 
     string pasirinkimas;
-    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
-    cin >> pasirinkimas;
+    cout << "Kaip norite matyti savo galutini bala?"<<endl;
+    cout << "1 - Vid." << endl;
+    cout << "2 - Med." << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas;
     cout << endl;
 
-    while (pasirinkimas != "V" && pasirinkimas != "M") {
-        cout << "Pasirinkite arba 'V' arba 'M'" << endl;
+    while (pasirinkimas != "1" && pasirinkimas != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas;
     }
 
-    if (pasirinkimas == "V") {
+    if (pasirinkimas == "1") {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
         cout << "-----------------------------------------------" << endl;
         for (auto& studentas : Duomenys) {
@@ -218,6 +291,7 @@ void GeneruotiPazymius(vector<Studentas>& Duomenys) {
     while (true) {
         cout << "Iveskite studento varda: ";
         cin >> studentas.v;
+        cout << endl;
         if (studentas.v == "BAIGTI" || studentas.v == "Baigti" || studentas.v == "baigti") break;
         while (cin.fail() || any_of(studentas.v.begin(), studentas.v.end(), [](char c) { return !isalpha(c); })) {
             cout << "Neteisinga ivestis, prasome ivesti varda sudaryta is raidziu" << endl;
@@ -225,9 +299,11 @@ void GeneruotiPazymius(vector<Studentas>& Duomenys) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Iveskite studento varda: ";
             cin >> studentas.v;
+            cout << endl;
         }
         cout << "Iveskite studento pavarde: ";
         cin >> studentas.p;
+        cout << endl;
         if (studentas.p == "BAIGTI" || studentas.p == "Baigti" || studentas.p == "baigti") break;
         while (cin.fail() || any_of(studentas.p.begin(), studentas.p.end(), [](char c) { return !isalpha(c); })) {
             cout << "Neteisinga ivestis, prasome ivesti pavarde sudaryta is raidziu" << endl;
@@ -235,6 +311,7 @@ void GeneruotiPazymius(vector<Studentas>& Duomenys) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Iveskite studento pavarde: ";
             cin >> studentas.p;
+            cout << endl;
         }
 
         // Egzamino rezultato generavimas
@@ -274,16 +351,19 @@ void GeneruotiPazymius(vector<Studentas>& Duomenys) {
 
     string pasirinkimas;
     cout << endl;
-    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
-    cin >> pasirinkimas;
+    cout << "Kaip norite matyti savo galutini bala?" << endl;
+    cout << "1 - Vid." << endl;
+    cout << "2 - Med." << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas;
     cout << endl;
 
-    while (pasirinkimas != "V" && pasirinkimas != "M") {
-        cout << "Pasirinkite arba 'V' arba 'M'" << endl;
+    while (pasirinkimas != "1" && pasirinkimas != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas;
     }
 
-    if (pasirinkimas == "V") {
+    if (pasirinkimas == "1") {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
         cout << "-----------------------------------------------" << endl;
         for (auto& studentas : Duomenys) {
@@ -311,7 +391,7 @@ void GeneruotiPazymiusVardus(int m3) {
 
         vector<string> VyriskiVardai = { "Arvydas", "Robertas", "Deivydas", "Marius", "Matas", "Jokubas", "Nojus", "Augustas", "Tomas", "Arnas" };
         vector<string> MoteriskiVardai = { "Gija", "Patricija", "Ieva", "Karolina", "Sandra", "Vita", "Aleksandra", "Liepa", "Smilte", "Guoste" };
-        vector<string> VyriskosPavardes = { "Petrauskas", "Jankauskas", "Butkus", "Navicka" "Kazlauskas" "Urbanavicius", "Sadauskas", "Mazeika", "Kavaliauskas", "Adomaitis" };
+        vector<string> VyriskosPavardes = { "Petrauskas", "Jankauskas", "Butkus", "Navickas", "Kazlauskas", "Urbanavicius", "Sadauskas", "Mazeika", "Kavaliauskas", "Adomaitis" };
         vector<string> MoteriskosPavardes = { "Kazlauskaite", "Petrauskaite", "Kavaliauskaite", "Jankauskaite", "Pociute", "Balciunaite", "Lukoseviciute", "Vasiliauskaite", "Butkute", "Leonaviciute" };
 
         // Vardo ir Pavardes generavimas
@@ -356,16 +436,19 @@ void GeneruotiPazymiusVardus(int m3) {
     // Rezultatu spausdinimas pasirenkant Vid. arba Med.
 
     string pasirinkimas;
-    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
-    cin >> pasirinkimas;
+    cout << "Kaip norite matyti savo galutini bala?" << endl;
+    cout << "1 - Vid." << endl;
+    cout << "2 - Med." << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas;
     cout << endl;
 
-    while (pasirinkimas != "V" && pasirinkimas != "M") {
-        cout << "Pasirinkite arba 'V' arba 'M'" << endl;
+    while (pasirinkimas != "1" && pasirinkimas != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas;
     }
 
-    if (pasirinkimas == "V") {
+    if (pasirinkimas == "1") {
         cout << left << setw(15) << "Pavarde" << setw(15) << "Vardas" << setw(15) << "Galutinis (Vid.)" << endl;
         cout << "-----------------------------------------------" << endl;
     }
@@ -375,7 +458,7 @@ void GeneruotiPazymiusVardus(int m3) {
     }
 
     for (int i = 0; i < m3; i++) {
-        if (pasirinkimas == "V") {
+        if (pasirinkimas == "1") {
             Duomenys[i].nd_vid = Duomenys[i].nd_sum / Duomenys[i].n;
             Duomenys[i].rez = 0.4 * Duomenys[i].nd_vid + 0.6 * Duomenys[i].egz_rez;
             cout << left << setw(15) << Duomenys[i].v << setw(15) << Duomenys[i].p << fixed << setprecision(2) << setw(15) << Duomenys[i].rez << endl;
@@ -419,7 +502,7 @@ double Skaitymas(const string& pavadinimas, vector<Studentas>& Duomenys) {
         }
         if (studentas.nd_rez.empty()) {
             cerr << "Nerasta namu darbu ivertinimu.";
-            return -1; // Return -1 to indicate failure
+            return -1;
         }
 
         studentas.nd_sum = studentas.nd_sum - studentas.nd_rez.back();
@@ -453,37 +536,47 @@ double Skaitymas(const string& pavadinimas, vector<Studentas>& Duomenys) {
 
 void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string& pavadinimas) {
     string pasirinkimas, pasirinkimas1, pasirinkimas2, pasirinkimas3;
-    cout << "Kaip norite matyti savo galutini bala? Irasykite viena is dvieju pasirinkimu: (V - Vid. / M - Med.)" << endl;
-    cin >> pasirinkimas;
-    while (pasirinkimas != "V" && pasirinkimas != "M") {
-        cout << "Pasirinkite arba 'V' arba 'M'" << endl;
+    cout << "Kaip norite matyti savo galutini bala?" << endl;
+    cout << "1 - Vid." << endl;
+    cout << "2 - Med." << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas;
+    while (pasirinkimas != "1" && pasirinkimas != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas;
     }
     cout << endl;
 
     cout << "Pagal ka norite rusiuoti rezultatus?" << endl;
-    cout << "V - Varda" << endl;
-    cout << "P - Pavarde" << endl;
-    cout << "B - Bala" << endl;
-    cin >> pasirinkimas3;
-    while (pasirinkimas3 != "V" && pasirinkimas3 != "P" && pasirinkimas3 != "B") {
-        cout << "Pasirinkite arba 'V' arba 'P' arba 'B'" << endl;
+    cout << "1 - Varda" << endl;
+    cout << "2 - Pavarde" << endl;
+    cout << "3 - Bala" << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas3;
+    while (pasirinkimas3 != "1" && pasirinkimas3 != "2" && pasirinkimas3 != "3") {
+        cout << "Pasirinkite arba '1' arba '2' arba '3'" << endl;
         cin >> pasirinkimas3;
     }
     cout << endl;
 
-    cout << "Kokia tvarka norite rusiuoti rezultatus: (D - Didejancia, M - Mazejancia)" << endl;
-    cin >> pasirinkimas1;
-    while (pasirinkimas1 != "D" && pasirinkimas1 != "M") {
-        cout << "Pasirinkite arba 'D' arba 'M'" << endl;
+    cout << "Kokia tvarka norite rusiuoti rezultatus?" << endl;
+    cout << "1 - Didejancia" << endl;
+    cout << "2 - Mazejancia" << endl;
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas1;
+    while (pasirinkimas1 != "1" && pasirinkimas1 != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas1;
     }
     cout << endl;
 
-    cout << "Kaip norite matyti rezultatus? (E - Ekrane, F - Faile) " << endl;
-    cin >> pasirinkimas2;
-    while (pasirinkimas2 != "E" && pasirinkimas2 != "F") {
-        cout << "Pasirinkite arba 'E' arba 'F'" << endl;
+    cout << "Kaip norite matyti rezultatus?" << endl;
+    cout << "1 - Ekrane" << endl;
+    cout << "2 - Faile" << endl; 
+    cout << endl;
+    cout << "Iveskite pasirinkima: "; cin >> pasirinkimas2;
+    while (pasirinkimas2 != "1" && pasirinkimas2 != "2") {
+        cout << "Pasirinkite arba '1' arba '2'" << endl;
         cin >> pasirinkimas2;
     }
     cout << endl;
@@ -491,7 +584,7 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string
 
     // Skaiciuojami galutiniai rezultatai
     for (auto& studentas : Duomenys) {
-        if (pasirinkimas == "V") {
+        if (pasirinkimas == "1") {
             studentas.nd_vid = studentas.nd_sum / studentas.nd_rez.size();
             studentas.rez = 0.4 * studentas.nd_vid + 0.6 * studentas.egz_rez;
         }
@@ -501,28 +594,28 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string
     }
 
     // Rusiuojama pagal pasirinkta kriteriju
-    if (pasirinkimas3 == "V") {
-        if (pasirinkimas1 == "D")
+    if (pasirinkimas3 == "1") {
+        if (pasirinkimas1 == "1")
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.v > b.v; });
         else
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.v < b.v; });
     }
-    else if (pasirinkimas3 == "P") {
-        if (pasirinkimas1 == "D")
+    else if (pasirinkimas3 == "2") {
+        if (pasirinkimas1 == "1")
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.p > b.p; });
         else
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.p < b.p; });
     }
-    else if (pasirinkimas3 == "B") {
-        if (pasirinkimas1 == "D")
+    else if (pasirinkimas3 == "3") {
+        if (pasirinkimas1 == "1")
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez > b.rez; });
         else
             sort(Duomenys.begin(), Duomenys.end(), [](const Studentas& a, const Studentas& b) { return a.rez < b.rez; });
     }
 
     // Pasirenkamas spausdinimas i konsole arba faila
-    if (pasirinkimas2 == "E") {
-        if (pasirinkimas == "V") {
+    if (pasirinkimas2 == "1") {
+        if (pasirinkimas == "1") {
             cout << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Vid.)" << endl;
             cout << "-----------------------------------------------" << endl;
             for (const auto& studentas : Duomenys) {
@@ -546,7 +639,7 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string
             cerr << "Nepavyko sukurti rezultatu failo.";
             return;
         }
-        if (pasirinkimas == "V") {
+        if (pasirinkimas == "1") {
             outfile << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis (Vid.)" << endl;
             outfile << "-----------------------------------------------" << endl;
             for (const auto& studentas : Duomenys) {
@@ -563,6 +656,4 @@ void RusiuotiSpausdinti(vector<Studentas>& Duomenys, double laikas, const string
         outfile.close();
         cout << "Rezultatai irasyti i faila rezultatai.txt" << endl;
     }
-    cout << pavadinimas <<" uztruko apdoroti: "<< laikas << " sekundes" << endl;
-    cout << endl;
 }
