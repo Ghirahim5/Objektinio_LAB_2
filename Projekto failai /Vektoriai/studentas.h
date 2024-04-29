@@ -33,7 +33,11 @@ public:
     Studentas(const std::string& v_, const std::string& p_, double mediana, double egz_rez_, double rez_, const std::vector<double>& nd_rez_);
 
     // destruktorius
-    ~Studentas() {}
+    ~Studentas() {
+	v.clear();
+	p.clear();
+	nd_rez.clear();
+    }
 
     // get'eriai
     inline std::string getV() const { return v; }
